@@ -5,7 +5,7 @@ import sys
 import json
 
 def get_input(day: int):
-    url = f"https://adventofcode.com/2022/day/{day}/input"
+    url = f"https://adventofcode.com/2023/day/{day}/input"
     s = requests.session()
     session = get_session()
     s.cookies.set("session", session)
