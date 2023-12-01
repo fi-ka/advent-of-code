@@ -17,7 +17,7 @@ def get_input(day: int):
     return response.text
 
 def create_input_file(day: int, input: str):
-    dir_path=os.path.join(os.path.dirname(__file__), f"src/main/kotlin/aoc/day{day}")
+    dir_path=os.path.join(os.path.dirname(__file__), f"src/day{day:02d}")
     filepath=os.path.join(dir_path, "input.txt")
     print(filepath)
     os.makedirs(dir_path, exist_ok=True)

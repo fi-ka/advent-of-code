@@ -1,6 +1,6 @@
 package util.template
 
-import aoc.util.*
+import util.runPart
 
 fun part1(input: String) {
     //val lines = readLines(input)

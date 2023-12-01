@@ -1,4 +1,4 @@
-package aoc.util
+package util
 
 /**
  * Returns a progression from this value toward the specified [to] value with the step -1.

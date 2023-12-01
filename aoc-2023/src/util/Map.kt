@@ -1,4 +1,4 @@
-package aoc.util
+package util
 
 fun Iterable<String>.mapToInt(): List<Int> {
     return this.map { it.toInt() }

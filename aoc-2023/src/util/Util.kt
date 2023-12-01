@@ -1,4 +1,4 @@
-package aoc.util
+package util
 
 import org.jetbrains.kotlinx.multik.ndarray.data.Dimension
 import org.jetbrains.kotlinx.multik.ndarray.data.MultiArray
