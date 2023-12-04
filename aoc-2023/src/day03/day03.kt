@@ -3,8 +3,20 @@ package day03
 import util.readLines
 import util.runPart
 
-fun Char.isSymbol(): Boolean {
+private fun Char.isSymbol(): Boolean {
     return !this.isDigit() && this != '.'
+}
+
+private fun getSurroundingCells(columns: IntRange, row: Int): Set<Pair<Int, Int>> {
+    val before = columns.first - 1
+    val after = columns.last + 1
+    val surroundingCells = mutableSetOf(
+        row to before,
+        row to after
+    )
+    surroundingCells.addAll((before..after).map { row - 1 to it })
+    surroundingCells.addAll((before..after).map { row + 1 to it })
+    return surroundingCells
 }
 
 fun part1(input: String) {
@@ -19,36 +31,22 @@ fun part1(input: String) {
         }
     }
 
-    var currentNumber = ""
-    val partNumbers = mutableListOf<Long>()
+    val partNumbers = mutableMapOf<Set<Pair<Int,Int>>, Long>()
     lines.withIndex().forEach { (row, line) ->
-        line.withIndex().forEach { (column, value) ->
-            if (value.isDigit()) {
-                currentNumber += value
-            }
-
-            if (currentNumber.isNotEmpty() && (!value.isDigit() || column == line.lastIndex)) {
-                val startColumn = if (!value.isDigit())
-                    column - currentNumber.length - 1
-                else
-                    column - currentNumber.length
-
-                val surroundingCells = mutableSetOf(
-                    row to startColumn,
-                    row to column
-                )
-                surroundingCells.addAll((startColumn..column).map { row-1 to it })
-                surroundingCells.addAll((startColumn..column).map { row+1 to it })
-
-                if (surroundingCells.any { it in symbols }) {
-                    partNumbers.add(currentNumber.toLong())
-                }
-
-                currentNumber = ""
-            }
+        val matches = """(\d+)""".toRegex().findAll(line)
+        matches.forEach { match ->
+            val surroundingCells = getSurroundingCells(match.range, row)
+            partNumbers[surroundingCells] = match.value.toLong()
         }
     }
-    println(partNumbers.sum())
+
+    val result = partNumbers.map { (cells, number) ->
+        if (cells.any { it in symbols })
+            number
+        else
+            0L
+    }.sum()
+    println(result)
 }
 
 fun part2(input: String) {
@@ -63,33 +61,12 @@ fun part2(input: String) {
         }
     }
 
-    var currentNumber = ""
     val partNumbers = mutableMapOf<Set<Pair<Int,Int>>, Long>()
     lines.withIndex().forEach { (row, line) ->
-        line.withIndex().forEach { (column, value) ->
-            if (value.isDigit()) {
-                currentNumber += value
-            }
-
-            if (currentNumber.isNotEmpty() && (!value.isDigit() || column == line.lastIndex)) {
-                val startColumn = if (!value.isDigit())
-                    column - currentNumber.length - 1
-                else
-                    column - currentNumber.length
-
-                val surroundingCells = mutableSetOf(
-                    row to startColumn,
-                    row to column
-                )
-                surroundingCells.addAll((startColumn..column).map { row-1 to it })
-                surroundingCells.addAll((startColumn..column).map { row+1 to it })
-
-                if (surroundingCells.any { it in symbols }) {
-                    partNumbers[surroundingCells] = currentNumber.toLong()
-                }
-
-                currentNumber = ""
-            }
+        val matches = """(\d+)""".toRegex().findAll(line)
+        matches.forEach { match ->
+            val surroundingCells = getSurroundingCells(match.range, row)
+            partNumbers[surroundingCells] = match.value.toLong()
         }
     }
 
