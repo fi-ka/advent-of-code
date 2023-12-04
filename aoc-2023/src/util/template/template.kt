@@ -1,6 +1,6 @@
 package util.template
 
-import util.runPart
+import util.*
 
 fun part1(input: String) {
     //val lines = readLines(input)
@@ -12,15 +12,15 @@ fun part2(input: String) {
 }
 
 fun main() {
-    val day = 1
+    val day = "1"
 
     println("--- Day $day ---")
-    val input = """src/main/kotlin/aoc/day$day/input.txt"""
-    val test = """src/main/kotlin/aoc/day$day/test.txt"""
+    val input = """src/day${day.padStart(2, '0')}/input.txt"""
+    val test = """src/day${day.padStart(2, '0')}/test.txt"""
 
     runPart("Part 1") {
         part1(test)
-        part1(input)
+        // part1(input)
     }
 
     runPart("Part 2") {
