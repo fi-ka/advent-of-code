@@ -2,15 +2,9 @@ package day09
 
 import util.*
 
-fun getDiffLists(list: List<Long>): List<List<Long>> {
-    var lastList = list
-    val diffLists = mutableListOf(list)
-    while(lastList.any { it != 0L }) {
-        val diffList = lastList.zipWithNext().map { it.second - it.first }
-        diffLists.add(diffList)
-        lastList = diffList
-    }
-    return diffLists
+fun getDiffLists(list: List<Long>): Sequence<List<Long>> {
+    return generateSequence(list) { it.zipWithNext { a, b -> b - a } }
+        .takeWhile { l -> l.any { it != 0L } }
 }
 
 fun predictNext(diffLists: List<List<Long>>): Long {
@@ -19,6 +13,10 @@ fun predictNext(diffLists: List<List<Long>>): Long {
         nextValue += it.last()
     }
     return nextValue
+}
+
+fun predictNextBySum(diffLists: List<List<Long>>): Long {
+    return diffLists.sumOf { it.last() }
 }
 
 fun predictPrevious(diffLists: List<List<Long>>): Long {
@@ -35,7 +33,7 @@ fun part1(input: String) {
     val histories = lines.map { it.split(" ").mapToLong() }
     val nextSum = histories.sumOf { history ->
         val diffLists = getDiffLists(history)
-        val next = predictNext(diffLists)
+        val next = predictNextBySum(diffLists.toList())
         next
     }
     println(nextSum)
@@ -47,7 +45,7 @@ fun part2(input: String) {
     val histories = lines.map { it.split(" ").mapToLong() }
     val previousSum = histories.sumOf { history ->
         val diffLists = getDiffLists(history)
-        val previous = predictPrevious(diffLists)
+        val previous = predictPrevious(diffLists.toList())
         previous
     }
     println(previousSum)
