@@ -1,9 +1,13 @@
+### Project###
+local_config.json
+input.txt
+test*.txt
+
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-local_config.json
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
