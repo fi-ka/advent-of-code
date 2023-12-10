@@ -52,7 +52,6 @@ fun part1(input: String) {
     println(steps)
 }
 
-
 fun part2(input: String) {
     val lines = readLines(input)
 
@@ -167,6 +166,109 @@ fun part2(input: String) {
             // If no move reached the outside of the map, all seen positions are inside the loop.
             if (!outside) {
                 inside.addAll(seenTiles)
+            }
+        }
+    }
+
+    println(inside.size)
+    println()
+}
+
+fun part2EvenOdd(input: String) {
+    val lines = readLines(input)
+
+    // Parse pipe map and startposition
+    lateinit var startPosition: Pair<Int, Int>
+    val pipes = lines.mapIndexed { r, line ->
+        line.mapIndexed { c, v ->
+            when (v) {
+                '|' -> listOf(r-1 to c, r+1 to c)
+                '-' -> listOf(r to c-1, r to c+1)
+                'L' -> listOf(r-1 to c, r to c+1)
+                'J' -> listOf(r-1 to c, r to c-1)
+                '7' -> listOf(r to c-1, r+1 to c)
+                'F' -> listOf(r to c+1, r+1 to c)
+                'S' -> {
+                    startPosition = r to c
+                    emptyList()
+                }
+                else -> {
+                    emptyList()
+                }
+            }
+        }.toMutableList()
+    }
+
+    // Add the connections of the start position to the pipe map
+    val startConnections = listOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
+        .map { startPosition.first + it.first to startPosition.second + it.second }
+        .filter { it.first in 0..pipes.lastIndex && it.second in 0..pipes.first().lastIndex }
+        .filter { pipes[it.first][it.second].contains(startPosition) }
+    pipes[startPosition.first][startPosition.second] = startConnections
+
+    // Find loop
+    val loop = mutableSetOf(startPosition)
+    var positions = startConnections.toSet()
+    var lastPositions = setOf(startPosition)
+    while (positions.size > 1) {
+        val nextPositions = positions.map { pos ->
+            val connections = pipes[pos.first][pos.second]
+            connections.first { it !in lastPositions }
+        }.toSet()
+        loop.addAll(positions)
+        lastPositions = positions
+        positions = nextPositions
+    }
+    loop.addAll(positions)
+
+    val isConnected = {a: Pair<Int,Int>, b: Pair<Int,Int> ->
+        pipes[a.first][a.second].contains(b) &&
+                pipes[b.first][b.second].contains(a) &&
+                a in loop
+    }
+
+    // Find positions inside the loop
+    // Search the pipe map by traversing positions in between tiles
+    val inside = mutableSetOf<Pair<Int, Int>>()
+    val allVisited = mutableSetOf<Pair<Int, Int>>()
+    for (r in 0..pipes.lastIndex) {
+        for (c in 0..pipes.first().lastIndex) {
+            if (r to c in allVisited || r to c in loop) continue
+
+            // Check loop segments to the right
+            val rightTiles = generateSequence(r to c) { it.first to it.second + 1 }
+                .takeWhile { it.second <= pipes.first().lastIndex }
+
+
+            val connections = mutableSetOf<Pair<Int,Int>>()
+            var lastLoopTile: Pair<Int,Int>? = null
+            var count = 0
+
+            rightTiles.forEach { tile ->
+                if (lastLoopTile != null && isConnected(lastLoopTile!!, tile)) {
+                    lastLoopTile = tile
+                    connections.addAll(pipes[tile.first][tile.second])
+                } else {
+                    if (connections.map { it.first }.distinct().size == 2) {
+                        count += 1
+                    }
+                    connections.clear()
+
+                    if (tile in loop) {
+                        count += 1
+                        connections.add(tile)
+                        connections.addAll(pipes[tile.first][tile.second])
+                        lastLoopTile = tile
+                    } else {
+                        lastLoopTile = null
+                    }
+                }
+            }
+            if (connections.map { it.first }.distinct().size == 2) {
+                count += 1
+            }
+            if (count % 2 != 0) {
+                inside.add(r to c)
             }
         }
     }
