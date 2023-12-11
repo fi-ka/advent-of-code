@@ -52,7 +52,7 @@ fun day11(input: String, expansion: Long) {
 fun main() {
     val day = "11"
 
-    println("--- Day $day ---")
+    println("==== Day $day ====")
     val input = """src/day${day.padStart(2, '0')}/input.txt"""
     val test = """src/day${day.padStart(2, '0')}/test.txt"""
 

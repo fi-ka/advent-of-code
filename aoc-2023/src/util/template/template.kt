@@ -14,7 +14,7 @@ fun part2(input: String) {
 fun main() {
     val day = "1"
 
-    println("--- Day $day ---")
+    println("==== Day $day ====")
     val input = """src/day${day.padStart(2, '0')}/input.txt"""
     val test = """src/day${day.padStart(2, '0')}/test.txt"""
 

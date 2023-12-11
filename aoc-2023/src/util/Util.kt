@@ -9,11 +9,10 @@ import kotlin.system.measureTimeMillis
 
 fun runPart(name: String, run: () -> Unit) {
     val elapsed = measureTimeMillis {
-        println("\n# $name")
+        println("\n---- $name ----")
         run()
-        println()
     }
-    println("Elapsed time: $elapsed ms")
+    println("Time: $elapsed ms")
 }
 
 fun readLines(path: String): List<String> {
