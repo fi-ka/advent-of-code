@@ -99,3 +99,27 @@ fun <T> List<T>.permutations(): List<List<T>> {
     generate(this.count(), this.toList())
     return perms
 }
+
+fun <T> List<T>.pairs(): Sequence<Pair<T,T>> {
+    val list = this
+    return sequence {
+        for (i in list.indices) {
+            for (j in (i + 1)..list.lastIndex) {
+                yield(list[i] to list[j])
+            }
+        }
+    }
+}
+
+fun <T> List<T>.triplets(): Sequence<Triple<T,T,T>> {
+    val list = this
+    return sequence {
+        for (i in list.indices) {
+            for (j in (i + 1)..list.lastIndex) {
+                for (k in (j + 1)..list.lastIndex) {
+                    yield(Triple(list[i], list[j], list[k]))
+                }
+            }
+        }
+    }
+}

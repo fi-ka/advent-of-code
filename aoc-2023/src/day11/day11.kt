@@ -5,36 +5,46 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+private data class Galaxy(val row: Int, val col: Int)
+
+private fun Pair<Galaxy, Galaxy>.shortestPath(): Int {
+    return abs(this.first.row-this.second.row) + abs(this.first.col-this.second.col)
+}
+
+private fun Pair<Galaxy, Galaxy>.spansRow(col: Int): Boolean {
+    return col in min(this.first.row, this.second.row)..max(this.first.row, this.second.row)
+}
+
+private fun Pair<Galaxy, Galaxy>.spansColumn(row: Int): Boolean {
+    return row in min(this.first.col, this.second.col)..max(this.first.col, this.second.col)
+}
+
 fun day11(input: String, expansion: Long) {
     val lines = readLines(input)
 
-    val rowsToExpand = lines.indices.filter { idx -> lines[idx].all { it == '.'} }
-    val colsToExpand = lines.first().indices.filter { idx -> lines.all { it[idx] == '.'} }
+    val height = lines.indices
+    val width = lines.first().indices
 
-    val galaxies = mutableSetOf<Pair<Int,Int>>()
-    lines.forEachIndexed { row, line ->
-        line.forEachIndexed { col, c ->
-            if (c == '#')
-                galaxies.add(row to col)
+    val rowsToExpand = height.filter { idx -> lines[idx].all { it == '.'} }
+    val colsToExpand = width.filter { idx -> lines.all { it[idx] == '.'} }
+
+    val galaxies = buildList {
+        lines.forEachIndexed { row, line ->
+            line.forEachIndexed { col, c ->
+                if (c == '#')
+                    add(Galaxy(row, col))
+            }
         }
     }
 
-    val checked = mutableSetOf<Pair<Pair<Int,Int>, Pair<Int,Int>>>()
-    val sum = galaxies.sumOf { a ->
-        galaxies.sumOf { b ->
-            if (a to b !in checked) {
-                checked.add(a to b)
-                checked.add(b to a)
-                val expandedRowsCount = rowsToExpand.count { it in min(a.first, b.first)..max(a.first, b.first) }
-                val expandedColCount = colsToExpand.count { it in min(a.second, b.second)..max(a.second, b.second) }
-                val sum = abs(b.first-a.first) + abs(b.second-a.second) +
-                        expandedRowsCount * (expansion - 1) +
-                        expandedColCount * (expansion - 1)
-                sum
-            } else {
-                0L
-            }
-        }
+    val sum = galaxies.pairs().sumOf { pair ->
+        val expandedRowsCount = rowsToExpand.count { pair.spansRow(it) }
+        val expandedColCount = colsToExpand.count { pair.spansColumn(it) }
+
+        val sum = pair.shortestPath() +
+                expandedRowsCount * (expansion - 1) +
+                expandedColCount * (expansion - 1)
+        sum
     }
     println(sum)
 }
