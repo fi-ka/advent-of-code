@@ -1,7 +1,6 @@
 package day12
 
 import util.*
-import kotlin.RuntimeException
 
 data class Record(val record: String, val groups: List<Int>)
 
@@ -11,7 +10,7 @@ fun Record.unfold(folds: Int): Record {
         generateSequence { groups }.take(folds).flatten().toList())
 }
 
-fun Record.arrangementsBruteForce(): Long {
+fun Record.arrangementsNaive(): Long {
     fun countArrangements(record: String, checkGroup: List<Int>): Long {
         if (record.all { it != '?' })
         {
@@ -26,86 +25,67 @@ fun Record.arrangementsBruteForce(): Long {
     return countArrangements(this.record, this.groups)
 }
 
+fun Record.arrangements(): Long {
+    // Caching the arrangement value for a (record, group) pair
+    val cache = mutableMapOf<Pair<String, List<Int>>, Long>()
 
-fun Record.arrangements(): List<Long> {
-    // Caching the arrangement value for a record and group pair
-    val cache = mutableMapOf<Pair<String, List<Int>>, List<Long>>()
-
-    fun countArrangements(record: String, checkGroup: List<Int>): List<Long> {
-        if (checkGroup.isEmpty() && record.all { it == '.' || it == '?' })
-            return listOf()
-        else if (checkGroup.isEmpty() ||
-            record.isEmpty() ||
-            (checkGroup.sum() + checkGroup.size-1) > record.length) {
-            return listOf(0L)
-        } else if (record to checkGroup in cache) {
-            return cache[record to checkGroup]!!
+    fun countArrangements(record: String, groups: List<Int>): Long {
+        if (groups.isEmpty() && record.all { it == '.' || it == '?' })
+            return 1L
+        else if (
+            groups.isEmpty() ||
+            record.length < (groups.sum() + groups.size-1)) {
+            return 0L
+        } else if (record to groups in cache) {
+            return cache[record to groups]!!
         }
 
-        if (record.startsWith("#")) {
-            val group = record.take(checkGroup.first())
-            val next = record.drop(checkGroup.first()).firstOrNull()
+        if (record.first() == '#') {
+            val groupLen = groups.first()
+            val group = record.take(groupLen)
+            val next = record.drop(groupLen).firstOrNull()
             val isGroup = group.all { it != '.' } && next != '#'
-            return if (isGroup) {
-                listOf(1L) + countArrangements(
-                    record.drop(checkGroup.first() + 1).trim('.'),
-                    checkGroup.drop(1),
-                )
-            } else {
-                listOf(0L)
-            }
-        } else if (record.startsWith("?")) {
-            val a = countArrangements(
-                record.drop(1).trimStart('.'),
-                checkGroup,
-            )
-            val b = countArrangements(
-                record.replaceFirstChar { '#' },
-                checkGroup,
-            )
-            val combine = if (0 !in a && 0 !in b) {
-                listOf(a.reduce{ acc ,l -> acc*l} + b.reduce{ acc ,l -> acc*l})
-            } else if (0 !in a) {
-                a
-            } else if (0 !in b) {
-                b
-            } else {
-                listOf(0L)
-            }
-            cache[record to checkGroup] = combine
-            return combine
-        } else {
-            throw RuntimeException("Start with '.'")
 
+            return if (isGroup) {
+                countArrangements(
+                    record.drop(groupLen + 1).trimStart('.'),
+                    groups.drop(1))
+            } else {
+                0L
+            }
+        } else { // record.first() == '?'
+            val arrangements = countArrangements(
+                record.drop(1).trimStart('.'),
+                groups,
+            ) + countArrangements(
+                record.replaceFirstChar { '#' },
+                groups,
+            )
+            cache[record to groups] = arrangements
+            return arrangements
         }
     }
 
-    return countArrangements(this.record.trimStart('.'), this.groups)
+    return countArrangements(this.record.trim('.'), this.groups)
 }
 
 fun part1(input: String) {
-    val records = readLines(input).map { it.parse("""([?#\.]+) ([0-9,]+)""") }
-        .map { (line, groups) -> Record(line, groups.split(",").mapToInt()) }
-    val sum = records.sumOf { record -> record.arrangements().reduce { acc, l -> acc * l } }
+    val records = readLines(input)
+        .map { it.split(' ') }
+        .map { (record, groups) -> Record(record, groups.split(",").mapToInt()) }
+    val sum = records.sumOf { record -> record.arrangements() }
 
     println(sum)
 }
 
 
 fun part2(input: String) {
-    val records = readLines(input).map { it.parse("""([?#\.]+) ([0-9,]+)""") }
-        .map { (line, groups) -> Record(line, groups.split(",").mapToInt()) }
+    val records = readLines(input)
+        .map { it.split(' ') }
+        .map { (record, groups) -> Record(record, groups.split(",").mapToInt()) }
         .map { it.unfold(5) }
 
-    val sum = records.withIndex().sumOf { (idx, record) ->
-        println("$idx: $record")
-        val result = record.arrangements()
-        println("$idx: $result")
-        println("$idx: ${result.reduce { acc, l -> acc * l }}")
-//        println(result)
-//        println(result.reduce { acc, l -> acc * l })
-        result.reduce { acc, l -> acc * l }
-    }
+    val sum = records.sumOf {it.arrangements() }
 
     println(sum)
 }
