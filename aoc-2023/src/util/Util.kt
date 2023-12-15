@@ -43,6 +43,10 @@ fun readBlocks(path: String, separator: (String) -> Boolean = { it.isEmpty()} ):
     return groups
 }
 
+fun Any?.println() {
+    println(this)
+}
+
 fun String.parse(regex: Regex): List<String> {
     return regex.matchEntire(this)!!.destructured.toList()
 }
