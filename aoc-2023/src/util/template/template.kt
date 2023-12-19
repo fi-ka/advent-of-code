@@ -15,8 +15,8 @@ fun main() {
     val day = "1"
 
     println("==== Day $day ====")
-    val input = """src/day${day.padStart(2, '0')}/input.txt"""
-    val test = """src/day${day.padStart(2, '0')}/test.txt"""
+    val input = getPath(day, "input.txt")
+    val test = getPath(day, "test.txt")
 
     runPart("Part 1") {
         part1(test)

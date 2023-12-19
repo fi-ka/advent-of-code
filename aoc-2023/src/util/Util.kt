@@ -15,6 +15,10 @@ fun runPart(name: String, run: () -> Unit) {
     println("Time: $elapsed ms")
 }
 
+fun getPath(day: String, fileName: String): String {
+    return """src/day${day.padStart(2, '0')}/$fileName"""
+}
+
 fun readLines(path: String): List<String> {
     return File(path).readLines()
 }
