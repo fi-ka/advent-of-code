@@ -35,7 +35,6 @@ fun Mirror.reflect(beam: Beam): List<Beam> {
 fun MirrorMap.energizedBy(beam: Beam): Int {
     var beams = listOf(beam)
     val prevBeams = mutableSetOf<Beam>()
-    val energized = mutableSetOf<Pos>()
     do {
         val newBeams = mutableListOf<Beam>()
         for ((pos, dRow, dCol) in beams) {
@@ -48,7 +47,6 @@ fun MirrorMap.energizedBy(beam: Beam): Int {
                 continue
 
             prevBeams.add(newBeam)
-            energized.add(newPos)
 
             if (newPos in mirrors)
                 newBeams.addAll(mirrors[newPos]!!.reflect(newBeam))
@@ -58,7 +56,7 @@ fun MirrorMap.energizedBy(beam: Beam): Int {
         beams = newBeams
     } while (beams.isNotEmpty())
 
-    return energized.size
+    return prevBeams.map { it.pos }.toSet().size
 }
 
 fun part1(input: String) {
@@ -113,8 +111,8 @@ fun main() {
     val day = "16"
 
     println("==== Day $day ====")
-    val input = """src/day${day.padStart(2, '0')}/input.txt"""
-    val test = """src/day${day.padStart(2, '0')}/test.txt"""
+    val input = getPath(day, "input.txt")
+    val test = getPath(day, "test.txt")
 
     runPart("Part 1") {
         part1(test)
