@@ -3,15 +3,6 @@ package day02
 import util.*
 import java.io.File
 
-
-fun part1(input: String) {
-    val lines = File(input).readLines()
-    lines.sumOf { line ->
-        val levels = line.split(" ").mapToInt()
-        if (levels.isSafe()) 1L else 0L
-    }.println()
-}
-
 fun List<Int>.isSafe(): Boolean {
     val pairs = this.zipWithNext()
     val allDecreasing = pairs.all { pair -> pair.first - pair.second in 1..3 }
@@ -19,19 +10,29 @@ fun List<Int>.isSafe(): Boolean {
     return (allDecreasing || allIncreasing)
 }
 
-fun part2(input: String) {
-    val lines = File(input).readLines()
-
-    val safeReports = lines.filter { line ->
-        val levels = line.split(" ").mapToInt()
-
-        levels.indices.any { indexToExclude ->
-            val dampened = levels.filterIndexed { index,_ -> index != indexToExclude }
-            dampened.isSafe()
-        }
+fun List<Int>.isSafeDampened(): Boolean {
+    return this.indices.any { indexToExclude ->
+        this.filterIndexed { index,_ -> index != indexToExclude }
+            .isSafe()
     }
+}
 
-    safeReports.size.println()
+fun part1(input: String) {
+    val reports = File(input)
+        .readLines()
+        .map { it.split(" ").mapToInt() }
+
+    val safeReports = reports.count { it.isSafe() }
+    safeReports.println()
+}
+
+fun part2(input: String) {
+    val reports = File(input)
+        .readLines()
+        .map { it.split(" ").mapToInt() }
+
+    val safeReports = reports.count { it.isSafeDampened() }
+    safeReports.println()
 }
 
 fun main() {
