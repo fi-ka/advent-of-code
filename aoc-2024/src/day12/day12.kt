@@ -10,7 +10,6 @@ fun part1(input: String) {
     val maxRow = grid.lastIndex
     val maxCol = grid.first().lastIndex
 
-    val regions = mutableListOf<Int>()
     val visited = mutableSetOf<Pair<Int,Int>>()
 
     val toVisit = mutableListOf(0 to 0)
@@ -51,7 +50,6 @@ fun part2(input: String) {
     val maxRow = grid.lastIndex
     val maxCol = grid.first().lastIndex
 
-    val regions = mutableListOf<Int>()
     val visited = mutableSetOf<Pair<Int,Int>>()
 
     val toVisit = mutableListOf(0 to 0)
@@ -62,74 +60,65 @@ fun part2(input: String) {
         val region = grid[node.first][node.second]
         var area = 0
         var perimeter = 0
-        var perimetersRow = mutableMapOf<Int, MutableSet<Int>>()
-        var perimetersCol = mutableMapOf<Int, MutableSet<Int>>()
+        var rowFences = mutableMapOf<Int, MutableSet<Int>>()
+        var colFences = mutableMapOf<Int, MutableSet<Int>>()
         val currentToVisit = mutableListOf(node)
         while (currentToVisit.isNotEmpty()) {
             val current = currentToVisit.removeFirst()
             if (current in visited) continue
 
             visited.add(current)
+            adj4.forEach { step ->
+                val adj = current.plus(step)
+                val adjIsInside = adj.isInside(maxRow, maxCol)
+                val adjIsInRegion = adjIsInside && grid[adj.first][adj.second] == region
 
-            val adjRegion = adj4.map { current.plus(it) }
-            val adjRegionNodes = adjRegion
-                .filter { adj -> adj.isInside(maxRow, maxCol) && grid[adj.first][adj.second] == region }
+                if (adjIsInRegion) {
+                    currentToVisit.add(adj)
+                } else if (adjIsInside) {
+                    toVisit.add(adj)
+                }
 
-            val adjOtherNodes = adjRegion
-                .filter { adj -> adj.isInside(maxRow, maxCol) && grid[adj.first][adj.second] != region }
-
-            val columnFences = listOf(0 to -1, 0 to 1)
-                .map { current.plus(it) }
-                .filter { adj -> !adj.isInside(maxRow, maxCol) || grid[adj.first][adj.second] != region }
-
-            val rowFences = listOf(-1 to 0, 1 to 0)
-                .map { current.plus(it) }
-                .filter { adj -> !adj.isInside(maxRow, maxCol) || grid[adj.first][adj.second] != region }
+                if (!adjIsInRegion) {
+                    val rowStep = step.first != 0
+                    if (rowStep) {
+                        val fenceRow = if (step.first == -1) adj.first + 1 else adj.first
+                        rowFences.getOrPut(fenceRow) { mutableSetOf() }.add(adj.second)
+                    } else {
+                        val fenceCol = if (step.second == -1) adj.second + 1 else adj.second
+                        colFences.getOrPut(fenceCol) { mutableSetOf() }.add(adj.first)
+                    }
+                }
+            }
 
             area += 1
-            columnFences.forEach { (row, col) ->
-                val fenceCol = if (col < current.second) col + 1 else col
-                if (fenceCol in perimetersCol)
-                    perimetersCol[fenceCol]!!.add(row)
-                else
-                    perimetersCol[fenceCol] = mutableSetOf(row)
-            }
-
-            rowFences.forEach { (row, col) ->
-                val fenceRow = if (row < current.first) row + 1 else row
-                if (fenceRow in perimetersRow)
-                    perimetersRow[fenceRow]!!.add(col)
-                else
-                    perimetersRow[fenceRow] = mutableSetOf(col)
-            }
-            currentToVisit.addAll(adjRegionNodes)
-            toVisit.addAll(adjOtherNodes)
         }
 
-        val periCol2 = perimetersCol.map { (col, it) ->
+        val mergedColFences = colFences.map { (col, it) ->
             val fences = it.sorted()
             val first = fences.first()
-            fences.drop(1).fold(listOf(first..first)) { acc, curr ->
-                val range = acc.last()
-                if (curr == range.last + 1 && perimetersRow[curr]?.any {it == col} != true)
-                    acc.dropLast(1).plus(listOf(range.first..curr))
+            fences.drop(1).fold(listOf(first..first)) { acc, row ->
+                val fence = acc.last()
+                if (row == fence.last + 1 && rowFences[row]?.any {it == col} != true)
+                    acc.dropLast(1) + listOf(fence.first..row)
                 else
-                    acc.plus(listOf(curr..curr))
-            }
-        }
-        val periRow2 = perimetersRow.map { (row, it) ->
-            val fences = it.sorted()
-            val first = fences.first()
-            fences.drop(1).fold(listOf(first..first)) { acc, curr ->
-                val range = acc.last()
-                if (curr == range.last + 1  && perimetersCol[curr]?.any {it == row} != true)
-                    acc.dropLast(1).plus(listOf(range.first..curr))
-                else
-                    acc.plus(listOf(curr..curr))
+                    acc + listOf(row..row)
             }
         }
 
-        perimeter = periCol2.sumOf { it.size } + periRow2.sumOf { it.size }
+        val mergedRowFences = rowFences.map { (row, it) ->
+            val fences = it.sorted()
+            val first = fences.first()
+            fences.drop(1).fold(listOf(first..first)) { acc, col ->
+                val fence = acc.last()
+                if (col == fence.last + 1  && colFences[col]?.any {it == row} != true)
+                    acc.dropLast(1) + listOf(fence.first..col)
+                else
+                    acc + listOf(col..col)
+            }
+        }
+
+        perimeter = mergedColFences.sumOf { it.size } + mergedRowFences.sumOf { it.size }
         sum += area * perimeter
     }
 
@@ -144,12 +133,12 @@ fun main() {
     val test = getPath(day, "test.txt")
 
     runPart("Part 1") {
-        part1(test)
+//        part1(test)
         part1(input)
     }
 
     runPart("Part 2") {
-         part2(test)
+//         part2(test)
          part2(input)
     }
 }
