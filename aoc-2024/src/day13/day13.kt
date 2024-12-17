@@ -5,14 +5,15 @@ import util.*
 fun part1(input: String) {
 }
 
-fun part2(input: String) {
+fun part(input: String, part2: Boolean = false) {
     val blocks = readBlocks(input)
     var sum = 0L
     blocks.map {
         val a = it[0].parse("""Button A: X\+(\d+), Y\+(\d+)""").mapToLong().zipWithNext().first()
         val b = it[1].parse("""Button B: X\+(\d+), Y\+(\d+)""").mapToLong().zipWithNext().first()
         var prize = it[2].parse("""Prize: X=(\d+), Y=(\d+)""").mapToLong().zipWithNext().first()
-        prize = prize.first + 10000000000000L to prize.second + 10000000000000
+        if (part2)
+            prize = prize.first + 10000000000000L to prize.second + 10000000000000
 
         // px = ax * numA + bx * numB
         // py = ay * numA + by * numB
@@ -34,12 +35,12 @@ fun main() {
     val test = getPath(day, "test.txt")
 
     runPart("Part 1") {
-        // part1(test)
-        // part1(input)
+        part(test)
+        part(input)
     }
 
     runPart("Part 2") {
-        part2(test)
-        part2(input)
+        part(test, part2 = true)
+        part(input, part2 = true)
     }
 }
