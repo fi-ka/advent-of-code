@@ -16,6 +16,10 @@ fun getPath(day: String, fileName: String): String {
     return """src/day${day.padStart(2, '0')}/$fileName"""
 }
 
+fun readLine(path: String): String {
+    return File(path).readLines().first()
+}
+
 fun readLines(path: String): List<String> {
     return File(path).readLines()
 }
