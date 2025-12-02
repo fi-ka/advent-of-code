@@ -10,16 +10,15 @@ fun part1(input: String) {
         .map { it[0]..it[1] }
 
     var sum = 0L
-
-    for (range in ranges) {
-        for (id in range) {
+    ranges.forEach { range ->
+        range.forEach { id ->
             val stringId = id.toString()
-            if (stringId.length % 2 != 0)
-                continue
 
-            val parts = stringId.chunked(stringId.length / 2)
-            if (parts[0] == parts[1])
-                sum += id
+            if (stringId.length % 2 == 0) {
+                val (first, second) = stringId.chunked(stringId.length / 2)
+                if (first == second)
+                    sum += id
+            }
         }
     }
 
@@ -34,10 +33,10 @@ fun part2(input: String) {
         .map { it[0]..it[1] }
 
     var sum = 0L
-    for (range in ranges) {
-        for (id in range) {
+    ranges.forEach { range ->
+        range.forEach { id ->
             val stringId = id.toString()
-            for (n in 1..stringId.length/2) {
+            for (n in 1..(stringId.length / 2)) {
                 if (stringId.length % n != 0)
                     continue
 
