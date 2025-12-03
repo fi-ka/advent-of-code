@@ -1,45 +1,33 @@
 package day03
 
 import util.*
+import java.io.File
 
-fun part1(input: String): Int {
-    val banks = readLines(input)
-    val sum = banks.sumOf { bank ->
-        val (index, first) = bank.dropLast(1)
-            .withIndex()
-            .maxBy {
-                it.value
-            }
+fun getMaxJoltage(bank: String, batteries: Int): Long {
+    val indexedBank = bank.withIndex().toList()
 
-        val second = bank
-            .drop(index+1)
-            .max()
+    var startIndex = 0
+    var joltage = ""
 
-        "$first$second".toInt()
+    for (remaining in batteries-1 downTo 0) {
+        val availableBatteries = indexedBank.subList(startIndex, bank.length - remaining)
+        val (index, battery) = availableBatteries.maxBy { it.value }
+
+        startIndex = index + 1
+        joltage += battery
     }
 
-    return sum
+    return joltage.toLong()
+}
+
+fun part1(input: String): Long {
+    val banks = File(input).readLines()
+    return banks.sumOf { bank -> getMaxJoltage(bank, batteries = 2) }
 }
 
 fun part2(input: String): Long {
-    val banks = readLines(input)
-    val sum = banks.sumOf { bank ->
-        var joltage = ""
-        var startIndex = 0
-        val indexedBank = bank.withIndex().toList()
-
-        (11 downTo 0).forEach { remainingBatteries ->
-            val availableBatteries = indexedBank.subList(startIndex, bank.length - remainingBatteries)
-            val (index, battery) = availableBatteries.maxBy { it.value }
-
-            startIndex = index + 1
-            joltage += battery
-        }
-
-        joltage.toLong()
-    }
-
-    return sum
+    val banks = File(input).readLines()
+    return banks.sumOf { bank -> getMaxJoltage(bank, batteries = 12) }
 }
 
 fun main() {
