@@ -60,12 +60,12 @@ fun main() {
     val test = getPath(day, "test.txt")
 
     runPart("Part 1") {
-        part1(test)
+        //part1(test)
         part1(input)
     }
 
     runPart("Part 2") {
-        part2(test)
+        //part2(test)
         part2(input)
     }
 }

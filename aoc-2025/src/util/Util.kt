@@ -2,10 +2,10 @@ package util
 
 import java.io.File
 import java.util.Collections.swap
-import kotlin.system.measureTimeMillis
+import kotlin.time.measureTime
 
 fun runPart(name: String, run: () -> Unit) {
-    val elapsed = measureTimeMillis {
+    val elapsed = measureTime {
         println("\n---- $name ----")
         run()
     }
