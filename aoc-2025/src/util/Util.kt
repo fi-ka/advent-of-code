@@ -3,13 +3,35 @@ package util
 import java.io.File
 import java.util.Collections.swap
 import kotlin.time.measureTime
+import kotlin.time.measureTimedValue
 
-fun runPart(name: String, run: () -> Unit) {
-    val elapsed = measureTime {
-        println("\n---- $name ----")
+fun measurePart(name: String, runs: Int = 1, initialRuns: Int = 1, run: () -> Any) {
+    println("\n---- $name ----")
+
+    val result = run()
+    repeat(initialRuns-1) {
         run()
     }
-    println("Time: $elapsed ms")
+
+    val duration = (1..runs).map {
+        measureTime {
+            run()
+        }
+    }
+    val average = duration.reduce { time1, time2 -> time1 + time2 } / runs
+
+    result.println()
+    println("Time: $average")
+}
+
+fun runPart(name: String, run: () -> Any) {
+    println("\n---- $name ----")
+    val (result, duration) = measureTimedValue {
+        run()
+    }
+
+    result.println()
+    println("Time: $duration")
 }
 
 fun getPath(day: String, fileName: String): String {

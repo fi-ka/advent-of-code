@@ -19,7 +19,7 @@ fun part1(input: String) {
     var result = 0
     var dial = 50
 
-    val l = rotations.map { value ->
+    rotations.map { value ->
         dial = (dial + value) % 100
 
         if (dial == 0) result++

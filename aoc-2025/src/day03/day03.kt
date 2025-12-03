@@ -2,7 +2,7 @@ package day03
 
 import util.*
 
-fun part1(input: String) {
+fun part1(input: String): Int {
     val banks = readLines(input)
     val sum = banks.sumOf { bank ->
         val (index, first) = bank.dropLast(1)
@@ -18,29 +18,28 @@ fun part1(input: String) {
         "$first$second".toInt()
     }
 
-    sum.println()
+    return sum
 }
 
-fun part2(input: String) {
+fun part2(input: String): Long {
     val banks = readLines(input)
     val sum = banks.sumOf { bank ->
         var joltage = ""
-        var nextStartIndex = 0
+        var startIndex = 0
         val indexedBank = bank.withIndex().toList()
 
-        (11 downTo 0).map { remainingBatteries ->
-            val (index, max) = indexedBank
-                .subList(nextStartIndex, bank.length - remainingBatteries)
-                .maxBy { it.value }
+        (11 downTo 0).forEach { remainingBatteries ->
+            val availableBatteries = indexedBank.subList(startIndex, bank.length - remainingBatteries)
+            val (index, battery) = availableBatteries.maxBy { it.value }
 
-            nextStartIndex = index + 1
-            joltage += max
+            startIndex = index + 1
+            joltage += battery
         }
 
         joltage.toLong()
     }
 
-    sum.println()
+    return sum
 }
 
 fun main() {
@@ -50,12 +49,12 @@ fun main() {
     val input = getPath(day, "input.txt")
     val test = getPath(day, "test.txt")
 
-    runPart("Part 1") {
+    measurePart("Part 1") {
         //part1(test)
         part1(input)
     }
 
-    runPart("Part 2") {
+    measurePart("Part 2") {
         //part2(test)
         part2(input)
     }
