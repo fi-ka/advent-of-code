@@ -37,12 +37,12 @@ fun main() {
     val input = getPath(day, "input.txt")
     val test = getPath(day, "test.txt")
 
-    measurePart("Part 1") {
+    measurePart("Part 1", 10) {
         //part1(test)
         part1(input)
     }
 
-    measurePart("Part 2") {
+    measurePart("Part 2", 10) {
         //part2(test)
         part2(input)
     }

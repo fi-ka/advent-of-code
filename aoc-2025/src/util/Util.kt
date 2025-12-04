@@ -19,9 +19,10 @@ fun measurePart(name: String, runs: Int = 1, initialRuns: Int = 1, run: () -> An
         }
     }
     val average = duration.reduce { time1, time2 -> time1 + time2 } / runs
-
+    val max = duration.max()
+    val min = duration.min()
     result.println()
-    println("Time: $average")
+    println("Average: $average, Max: $max, Min: $min")
 }
 
 fun runPart(name: String, run: () -> Any) {
