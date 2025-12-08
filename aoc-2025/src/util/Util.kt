@@ -5,7 +5,7 @@ import java.util.Collections.swap
 import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
 
-fun measurePart(name: String, runs: Int = 1, initialRuns: Int = 1, run: () -> Any) {
+fun measurePart(name: String, runs: Int = 1, initialRuns: Int = 1, run: () -> Any?) {
     println("\n---- $name ----")
 
     val result = run()
@@ -25,7 +25,7 @@ fun measurePart(name: String, runs: Int = 1, initialRuns: Int = 1, run: () -> An
     println("Average: $average, Max: $max, Min: $min")
 }
 
-fun runPart(name: String, run: () -> Any) {
+fun runPart(name: String, run: () -> Any?) {
     println("\n---- $name ----")
     val (result, duration) = measureTimedValue {
         run()
